@@ -41,7 +41,7 @@
                         <configuration>
                             <archive>
                                 <manifest>
-                                    <mainClass>py.una.server.udp.ChatUDPServer</mainClass>
+                                    <mainClass>py.una.server.udp.UDPChatServer</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>

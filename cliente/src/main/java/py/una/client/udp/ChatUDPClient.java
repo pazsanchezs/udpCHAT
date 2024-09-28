@@ -25,8 +25,12 @@ public class ChatUDPClient {
                     while (true) {
                         DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
                         clientSocket.receive(receivePacket);
-                        String message = new String(receivePacket.getData(), 0, receivePacket.getLength());
-                        System.out.println(message);
+                        String message = new String(receivePacket.getData(), 0, receivePacket.getLength()).trim();
+
+                        // Comprobar si el mensaje proviene del cliente
+                        if (!message.startsWith(username + ":")) {
+                            System.out.println(message);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

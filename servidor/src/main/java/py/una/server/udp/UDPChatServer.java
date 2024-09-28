@@ -3,13 +3,14 @@ package py.una.server.udp;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class UDPChatServer {
     public static void main(String[] args) {
         int puertoServidor = 9876;
-        List<DatagramPacket> clients = new ArrayList<>();
+        Set<InetAddress> clientAddresses = new HashSet<>();
+        Set<Integer> clientPorts = new HashSet<>();
 
         try {
             DatagramSocket serverSocket = new DatagramSocket(puertoServidor);
@@ -28,16 +29,18 @@ public class UDPChatServer {
 
                 System.out.println("Mensaje recibido de " + clientAddress + ":" + clientPort + " - " + message);
 
-                // Guardar el cliente si no está en la lista
-                if (!clients.contains(receivePacket)) {
-                    clients.add(receivePacket);
-                }
+                // Guardar la dirección y puerto del cliente si no están en la lista
+                clientAddresses.add(clientAddress);
+                clientPorts.add(clientPort);
 
                 // Reenviar el mensaje a todos los clientes
-                for (DatagramPacket client : clients) {
-                    if (!client.getAddress().equals(clientAddress) || client.getPort() != clientPort) {
-                        DatagramPacket sendPacket = new DatagramPacket(receivePacket.getData(), receivePacket.getLength(), client.getAddress(), client.getPort());
-                        serverSocket.send(sendPacket);
+                for (InetAddress address : clientAddresses) {
+                    for (Integer port : clientPorts) {
+                        // Asegurarse de que no se reenvíe al mismo cliente que envió el mensaje
+                        if (!(address.equals(clientAddress) && port.equals(clientPort))) {
+                            DatagramPacket sendPacket = new DatagramPacket(receivePacket.getData(), receivePacket.getLength(), address, port);
+                            serverSocket.send(sendPacket);
+                        }
                     }
                 }
             }
